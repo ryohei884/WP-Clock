@@ -1,5 +1,4 @@
-import { Button } from '@/components/button';
-import { Link } from '@/components/link';
+import { Link } from '@/src/components/link';
 
 export default function Page() {
     return (
