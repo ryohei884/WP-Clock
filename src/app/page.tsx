@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef,createRef, useEffect } from "react";
 import type { ChangeEvent } from "react";
 import { Button } from "@/src/components/button";
 import { ShotClock } from "@/src/components/clock/shot-clock";
@@ -18,61 +18,164 @@ export default function Home() {
   const [timeLefts, setTimeLefts] = useState<number[]>([240*10, 30*10, 20*10]);
   const [isActives, setIsActives] = useState<boolean[]>([false, false, false]);
   const [isPauseds, setIsPauseds] = useState<boolean[]>([false, false, false]);
-  const timerRefs = useRef<NodeJS.Timeout[] | null[]>([null, null, null]);
+  const timerRefs = useRef<Array<NodeJS.Timeout | null>>([null, null, null]);
 
   const handleSetDuration = (index: number): void => {
     if (durations[index] > 0) {
 
       const nextDurations = durations.map((d, i) => {
         if (i === index) {
-          // Increment the clicked counter
           return d;
         } else {
-          // The rest haven't changed
           return d;
         }
       });
       setDurations(nextDurations);
 
-      setTimeLefts(duration[index] * 10);
-      setIsActives(false);
-      setIsPauseds(false);
-      if (timerRefs[index].current) {
-        clearInterval(timerRefs[index].current);
+      const nextTimeLefts = nextDurations.map((d, i) => {
+        if (i === index) {
+          return d * 10;
+        } else {
+          return d;
+        }
+      });
+      setTimeLefts(nextTimeLefts);
+
+      const nextIsActives = isActives.map((d, i) => {
+        if (i === index) {
+          return false;
+        } else {
+          return d;
+        }
+      });     
+      setIsActives(nextIsActives);
+
+      const nextIsPauseds = isPauseds.map((d, i) => {
+        if (i === index) {
+          return false;
+        } else {
+          return d;
+        }
+      });     
+      setIsPauseds(nextIsPauseds);
+
+      for (const i in timerRefs) {
+        clearInterval(timerRefs.current[i]);
       }
+      // return clearInterval(timerRefs.current[index]);
+   
+
+      // if (timerRefs[index].current) {
+      //   clearInterval(timerRefs[index].current);
+      // }
     }
   };
 
   const handleStart = (index: number): void => {
-    if (timeLeft > 0) {
-      setIsActive(true);
-      setIsPaused(false);
+    if (timeLefts[index] > 0) {
+      const nextIsActives = isActives.map((d, i) => {
+        if (i === index) {
+          return true;
+        } else {
+          return d;
+        }
+      });     
+      setIsActives(nextIsActives);
+      const nextIsPauseds = isPauseds.map((d, i) => {
+        if (i === index) {
+          return false;
+        } else {
+          return d;
+        }
+      });     
+      setIsPauseds(nextIsPauseds);
     }
     playBallKeepStart();
   };
 
   const handlePause = (index: number): void => {
-    if (isActive) {
-      setIsPaused(true);
-      setIsActive(false);
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
+    if (isActives[index]) {
+      const nextIsPauseds = isPauseds.map((d, i) => {
+        if (i === index) {
+          return true;
+        } else {
+          return d;
+        }
+      });     
+      setIsPauseds(nextIsPauseds);
+
+      const nextIsActives = isActives.map((d, i) => {
+        if (i === index) {
+          return false;
+        } else {
+          return d;
+        }
+      });     
+      setIsActives(nextIsActives);
+
+      const nextTimerRefs = timerRefs.map((d: NodeJS.Timeout | null, i: number) => {
+        if (i === index) {
+          if (timerRefs[index].current) {
+            return clearInterval(timerRefs[index].current);
+          }
+        } else {
+          return d;
+        }
+      });   
+      setTimerRefs(nextTimerRefs);
+
     }
     playBallKeepPause();
   };
 
   const handleReset = (index: number): void => {
-    setIsActive(false);
-    setIsPaused(false);
-    setTimeLeft(typeof duration === "number" ? duration * 10 : 0);
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
+      const nextIsActives = isActives.map((d, i) => {
+        if (i === index) {
+          return false;
+        } else {
+          return d;
+        }
+      });     
+      setIsActives(nextIsActives);
+      const nextIsPauseds = isPauseds.map((d, i) => {
+        if (i === index) {
+          return false;
+        } else {
+          return d;
+        }
+      });     
+      setIsPauseds(nextIsPauseds);
+
+      const nextTimeLefts = durations.map((d, i) => {
+        if (i === index) {
+          return typeof d === "number" ? d * 10 : 0;
+        } else {
+          return d;
+        }
+      });
+      setTimeLefts(nextTimeLefts);
+
+      const nextTimerRefs = timerRefs.map((d: NodeJS.Timeout | null, i: number) => {
+        if (i === index) {
+          if (timerRefs[index].current) {
+            return clearInterval(timerRefs[index].current);
+          }
+        } else {
+          return d;
+        }
+      });   
+      setTimerRefs(nextTimerRefs);
   };
 
   const handleDurationChange = (index: number, e: ChangeEvent<HTMLInputElement>): void => {
-    setDuration(Number(e.target.value) || "");
+    const nextDurations = durations.map((d, i) => {
+      if (i === index) {
+        return Number(e.target.value);
+      } else {
+        return d;
+      }
+    });
+    setDurations(nextDurations);
   };
 
   useEffect(() => {
@@ -93,7 +196,7 @@ export default function Home() {
         clearInterval(timerRef.current);
       }
     };
-  }, [isActive, isPaused, playShotTimeOver]);
+  }, [isActives, isPauseds, playShotTimeOver]);
 
   const OpenSubWindow = () => {
     window.open(`http://localhost:3000/subwindow`, "Child1", "popup");
