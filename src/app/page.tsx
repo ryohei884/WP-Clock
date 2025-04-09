@@ -18,7 +18,8 @@ export default function Home() {
   const [timeLefts, setTimeLefts] = useState<number[]>([240*10, 30*10, 20*10]);
   const [isActives, setIsActives] = useState<boolean[]>([false, false, false]);
   const [isPauseds, setIsPauseds] = useState<boolean[]>([false, false, false]);
-  const timerRefs = useRef<Array<NodeJS.Timeout | null>>([null, null, null]);
+  const [timerRefs, setTimerRefs] = useState<Array<NodeJS.Timeout | null>>([null, null, null]);
+//  const timerRefs = useRef<Array<NodeJS.Timeout | null>>([null, null, null]);
 
   const handleSetDuration = (index: number): void => {
     if (durations[index] > 0) {
@@ -59,15 +60,17 @@ export default function Home() {
       });     
       setIsPauseds(nextIsPauseds);
 
-      for (const i in timerRefs) {
-        clearInterval(timerRefs.current[i]);
-      }
-      // return clearInterval(timerRefs.current[index]);
-   
-
-      // if (timerRefs[index].current) {
-      //   clearInterval(timerRefs[index].current);
-      // }
+      const nextTimerRefs = timerRefs.map((d, i) => {
+        if (i === index) {
+          if (d !== null) {
+            clearInterval(d);
+                }
+                return null;
+        } else {
+          return d;
+        }
+      });
+      setTimerRefs(nextTimerRefs);
     }
   };
 
@@ -113,17 +116,17 @@ export default function Home() {
       });     
       setIsActives(nextIsActives);
 
-      const nextTimerRefs = timerRefs.map((d: NodeJS.Timeout | null, i: number) => {
+      const nextTimerRefs = timerRefs.map((d, i) => {
         if (i === index) {
-          if (timerRefs[index].current) {
-            return clearInterval(timerRefs[index].current);
-          }
+          if (d !== null) {
+            clearInterval(d);
+                }
+                return null;
         } else {
           return d;
         }
-      });   
+      });
       setTimerRefs(nextTimerRefs);
-
     }
     playBallKeepPause();
   };
@@ -137,6 +140,7 @@ export default function Home() {
         }
       });     
       setIsActives(nextIsActives);
+
       const nextIsPauseds = isPauseds.map((d, i) => {
         if (i === index) {
           return false;
@@ -155,15 +159,16 @@ export default function Home() {
       });
       setTimeLefts(nextTimeLefts);
 
-      const nextTimerRefs = timerRefs.map((d: NodeJS.Timeout | null, i: number) => {
+            const nextTimerRefs = timerRefs.map((d, i) => {
         if (i === index) {
-          if (timerRefs[index].current) {
-            return clearInterval(timerRefs[index].current);
-          }
+          if (d !== null) {
+            clearInterval(d);
+                }
+                return null;
         } else {
           return d;
         }
-      });   
+      });
       setTimerRefs(nextTimerRefs);
   };
 
@@ -195,6 +200,13 @@ export default function Home() {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
+      const nextTimerRefs = timerRefs.map((d, i) => {
+          if (d !== null) {
+            clearInterval(d);
+                }
+                return null;
+              })
+      setTimerRefs(nextTimerRefs);
     };
   }, [isActives, isPauseds, playShotTimeOver]);
 
