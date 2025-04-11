@@ -11,7 +11,7 @@ import Ni from "@/public/sounds/Ni.mp3";
 import Ichi from "@/public/sounds/Ichi.mp3";
 
 export function ShotClock({
-    index,
+  index,
   duration,
   timeLeft,
   isPaused,
@@ -21,7 +21,7 @@ export function ShotClock({
   handleReset,
   handleDurationChange,
 }: {
-    index: number;
+  index: number;
   duration: number;
   timeLeft: number;
   isPaused: boolean;
@@ -29,7 +29,10 @@ export function ShotClock({
   handleStart: (index: number) => void;
   handlePause: (index: number) => void;
   handleReset: (index: number) => void;
-  handleDurationChange: (index: number, e: ChangeEvent<HTMLInputElement>) => void;
+  handleDurationChange: (
+    index: number,
+    e: ChangeEvent<HTMLInputElement>,
+  ) => void;
 }) {
   const [playGo] = useSound(Go, { volume: 0.5 });
   const [playYon] = useSound(Yon, { volume: 0.5 });
@@ -76,7 +79,9 @@ export function ShotClock({
           id="duration"
           placeholder="Enter duration in seconds"
           value={duration}
-          onChange={(e) => {handleDurationChange(index, e)}}
+          onChange={(e) => {
+            handleDurationChange(index, e);
+          }}
           className="flex-1 mr-4 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200"
         />
         <Button
