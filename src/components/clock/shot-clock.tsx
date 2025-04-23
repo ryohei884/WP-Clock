@@ -1,14 +1,6 @@
-"use client";
-
 import type { ChangeEvent, MouseEvent } from "react";
 import { Input } from "@/src/components/input";
 import { Button } from "@/src/components/button";
-import useSound from "use-sound";
-import Go from "@/public/sounds/Go.mp3";
-import Yon from "@/public/sounds/Yon.mp3";
-import San from "@/public/sounds/San.mp3";
-import Ni from "@/public/sounds/Ni.mp3";
-import Ichi from "@/public/sounds/Ichi.mp3";
 
 export function ShotClock({
   index,
@@ -34,35 +26,10 @@ export function ShotClock({
     e: ChangeEvent<HTMLInputElement>,
   ) => void;
 }) {
-  const [playGo] = useSound(Go, { volume: 0.5 });
-  const [playYon] = useSound(Yon, { volume: 0.5 });
-  const [playSan] = useSound(San, { volume: 0.5 });
-  const [playNi] = useSound(Ni, { volume: 0.5 });
-  const [playIchi] = useSound(Ichi, { volume: 0.5 });
-
   const formatTime = (time: number): string => {
     const minutes = Math.floor(time / 600);
     const seconds = Math.floor((time % 600) / 10);
     const msec = (time % 600) - seconds * 10;
-    switch (time) {
-      case 50:
-        playGo();
-        break;
-      case 40:
-        playYon();
-        break;
-      case 30:
-        playSan();
-        break;
-      case 20:
-        playNi();
-        break;
-      case 10:
-        playIchi();
-        break;
-      default:
-        break;
-    }
     return `${String(minutes).padStart(1, "0")}:${String(seconds).padStart(2, "0")}.${String(msec)}`;
   };
 

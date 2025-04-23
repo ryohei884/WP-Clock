@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type { ChangeEvent } from "react";
 import { Button } from "@/src/components/button";
 import { ShotClock } from "@/src/components/clock/shot-clock";
@@ -8,8 +8,18 @@ import useSound from "use-sound";
 import ShotTimeOver from "@/public/sounds/ShotTimeOver.mp3";
 import BallKeepStart from "@/public/sounds/BallKeepStart.mp3";
 import BallKeepPause from "@/public/sounds/BallKeepPause.mp3";
+import Go from "@/public/sounds/Go.mp3";
+import Yon from "@/public/sounds/Yon.mp3";
+import San from "@/public/sounds/San.mp3";
+import Ni from "@/public/sounds/Ni.mp3";
+import Ichi from "@/public/sounds/Ichi.mp3";
 
 export default function Home() {
+  const [playGo] = useSound(Go, { volume: 0.5 });
+  const [playYon] = useSound(Yon, { volume: 0.5 });
+  const [playSan] = useSound(San, { volume: 0.5 });
+  const [playNi] = useSound(Ni, { volume: 0.5 });
+  const [playIchi] = useSound(Ichi, { volume: 0.5 });
   const [playBallKeepStart] = useSound(BallKeepStart, { volume: 0.1 });
   const [playBallKeepPause] = useSound(BallKeepPause, { volume: 0.1 });
   const [playShotTimeOver] = useSound(ShotTimeOver, { volume: 1 });
@@ -25,28 +35,36 @@ export default function Home() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [timerActive, setTimerActive] = useState<boolean>(false);
   const [timerPaused, setTimerPaused] = useState<boolean>(false);
+  const [timeNow, setTimeNow] = useState<string>("");
+  const timerNowRef = useRef<NodeJS.Timeout | null>(null);
 
-  const changeIsActives = (index: number, value: boolean): void => {
-    const nextIsActives = isActives.map((v, i) => {
-      if (i === index) {
-        return value;
-      } else {
-        return v;
-      }
-    });
-    setIsActives(nextIsActives);
-  };
+  const changeIsActives = useCallback(
+    (index: number, value: boolean): void => {
+      const nextIsActives = isActives.map((v, i) => {
+        if (i === index) {
+          return value;
+        } else {
+          return v;
+        }
+      });
+      setIsActives(nextIsActives);
+    },
+    [isActives],
+  );
 
-  const changeIsPauseds = (index: number, value: boolean): void => {
-    const nextIsPauseds = isPauseds.map((v, i) => {
-      if (i === index) {
-        return value;
-      } else {
-        return v;
-      }
-    });
-    setIsPauseds(nextIsPauseds);
-  };
+  const changeIsPauseds = useCallback(
+    (index: number, value: boolean): void => {
+      const nextIsPauseds = isPauseds.map((v, i) => {
+        if (i === index) {
+          return value;
+        } else {
+          return v;
+        }
+      });
+      setIsPauseds(nextIsPauseds);
+    },
+    [isPauseds],
+  );
 
   const changeTimeLefts = (index: number, value: number): void => {
     const nextTimeLefts = timeLefts.map((v, i) => {
@@ -122,16 +140,57 @@ export default function Home() {
     changeDurations(index, Number(e.target.value));
   };
 
+  const showCurrentTime = () => {
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = String(now.getMinutes()).padStart(2, "0");
+    const second = String(now.getSeconds()).padStart(2, "0");
+    const msec = String(Math.floor(now.getMilliseconds() / 100)).padStart(
+      1,
+      "0",
+    );
+    const time = `現在の時刻は${hour}時${minute}分${second}秒${msec}秒です。`;
+    return time;
+  };
+
   useEffect(() => {
     if (timerActive && !timerPaused) {
       timerRef.current = setInterval(() => {
         setTimeLefts((prevTime) => {
-          const nextTimeLefts = prevTime.map((v) => {
-            if (v <= 1) {
-              playShotTimeOver();
-              return 0;
+          const nextTimeLefts = prevTime.map((v, i) => {
+            if (isActives[i] && !isPauseds[i]) {
+              switch (v) {
+                case 50:
+                  playGo();
+                  return v - 1;
+                case 40:
+                  playYon();
+                  return v - 1;
+                case 30:
+                  playSan();
+                  return v - 1;
+                case 20:
+                  playNi();
+                  return v - 1;
+                case 10:
+                  playIchi();
+                  return v - 1;
+                case 0:
+                  if (isActives[i] && !isPauseds[i]) {
+                    playShotTimeOver();
+                    changeIsActives(i, false);
+                    changeIsPauseds(i, true);
+                  }
+                  return 0;
+                default:
+                  return v - 1;
+              }
             } else {
-              return v - 1;
+              if (v <= 0) {
+                return 0;
+              } else {
+                return v - 1;
+              }
             }
           });
           return nextTimeLefts;
@@ -139,12 +198,35 @@ export default function Home() {
       }, 100);
     }
 
+    timerNowRef.current = setInterval(() => {
+      setTimeNow(() => {
+        const nextTimeNow = showCurrentTime();
+        return nextTimeNow;
+      });
+    }, 100);
+
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
       }
+      if (timerNowRef.current) {
+        clearInterval(timerNowRef.current);
+      }
     };
-  }, [timerActive, timerPaused, playShotTimeOver]);
+  }, [
+    timerActive,
+    timerPaused,
+    playShotTimeOver,
+    changeIsActives,
+    changeIsPauseds,
+    playGo,
+    playIchi,
+    playNi,
+    playSan,
+    playYon,
+    isActives,
+    isPauseds,
+  ]);
 
   const OpenSubWindow = () => {
     window.open(`http://localhost:3000/subwindow`, "Child1", "popup");
@@ -154,6 +236,7 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Button onClick={OpenSubWindow}>Save changes</Button>
+        <div>{timeNow}</div>
         {timeLefts.map((v, i) => {
           return (
             <ShotClock
