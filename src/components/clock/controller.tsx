@@ -15,7 +15,26 @@ import Ni from "@/public/sounds/Ni.mp3";
 import Ichi from "@/public/sounds/Ichi.mp3";
 import { Link } from "@/src/components/link";
 
-export default function Home() {
+// periods: period in a game
+// actualPlay: the exact periods of actual play
+// timeout:  the exact periods of timeout
+// intervals: intervals between the periods
+// possession: the periods of continuous possession of the ball by each team
+// reEntry: re-entry times (expiration of the period of exclusion) of excluded players or their subsitutes
+const lengthOfTimeout = [60, 45]; // [length of timeout, timing of signal]
+const intervalsOfPeriods = [120, 180, 120]; // [intervals after 1st, 2nd, 3rd periods]
+const lengthOfPossetion = [30, 20]; // [continuous possession of the ball, after shoot]
+const lengthOfExclusion = [20, 240]; // [exclusion, excluded for violent actions]
+
+export default function Controller({
+  p,
+  a,
+  t,
+}: {
+  p: number;
+  a: number;
+  t: number;
+}) {
   const [playGo] = useSound(Go, { volume: 0.5 });
   const [playYon] = useSound(Yon, { volume: 0.5 });
   const [playSan] = useSound(San, { volume: 0.5 });
@@ -25,11 +44,15 @@ export default function Home() {
   const [playBallKeepPause] = useSound(BallKeepPause, { volume: 0.1 });
   const [playShotTimeOver] = useSound(ShotTimeOver, { volume: 1 });
 
-  const [durations, setDurations] = useState<number[]>([240, 30, 20]);
+  const [durations, setDurations] = useState<number[]>([
+    a,
+    lengthOfPossetion[0],
+    lengthOfPossetion[1],
+  ]);
   const [timeLefts, setTimeLefts] = useState<number[]>([
-    240 * 10,
-    30 * 10,
-    20 * 10,
+    a * 10,
+    lengthOfPossetion[0] * 10,
+    lengthOfPossetion[1] * 10,
   ]);
   const [isActives, setIsActives] = useState<boolean[]>([false, false, false]);
   const [isPauseds, setIsPauseds] = useState<boolean[]>([false, false, false]);
@@ -233,37 +256,14 @@ export default function Home() {
     window.open(`http://localhost:3000/subwindow`, "Child1", "popup");
   };
 
-  // periods: period in a game
-  // actualPlay: the exact periods of actual play
-  // timeout:  the exact periods of timeout
-  // intervals: intervals between the periods
-  // possession: the periods of continuous possession of the ball by each team
-  // reEntry: re-entry times (expiration of the period of exclusion) of excluded players or their subsitutes
-
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Button onClick={OpenSubWindow}>Save changes</Button>
-        <Link href="http://localhost:3000/controller?p=4&a=480&t=2">
-          正式競技時間
+        <Link href="http://localhost:3000/controller?shot=30&shoot=20&ex=20&nop=4">
+          LINK
         </Link>
-        <Link href="http://localhost:3000/controller?p=2&a=240&t=0">
-          A区分予選競技時間
-        </Link>
-        <Link href="http://localhost:3000/controller?p=4&a=240&t=2">
-          A区分決勝競技時間
-        </Link>
-        <div>
-          periods: 4, actualPlay: 8min, timeout: 1min, signal45sec, intervals:
-          2min,3min,2min, possession: 20 or 30, reEntry: 20sec of actual play,
-          excluded for violent actions=4min
-        </div>
         <div>{timeNow}</div>
-        <div>ピリオド数(p):4ピリオド(4)</div>
-        <div>正味競技時間(a)：8分(480)</div>
-        {/* <div>ボール保持時間(b):30秒(30)</div>
-        <div>シュート後リセット時間(r):20秒(20)</div> */}
-        <div>タイムアウト回数(t):2回(2)</div>
         {timeLefts.map((v, i) => {
           return (
             <ShotClock
