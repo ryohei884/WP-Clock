@@ -21,19 +21,19 @@ import { Link } from "@/src/components/link";
 // intervals: intervals between the periods
 // possession: the periods of continuous possession of the ball by each team
 // reEntry: re-entry times (expiration of the period of exclusion) of excluded players or their subsitutes
-const lengthOfTimeout = [60, 45]; // [length of timeout, timing of signal]
-const intervalsOfPeriods = [120, 180, 120]; // [intervals after 1st, 2nd, 3rd periods]
+// const lengthOfTimeout = [60, 45]; // [length of timeout, timing of signal]
+// const intervalsOfPeriods = [120, 180, 120]; // [intervals after 1st, 2nd, 3rd periods]
 const lengthOfPossetion = [30, 20]; // [continuous possession of the ball, after shoot]
-const lengthOfExclusion = [20, 240]; // [exclusion, excluded for violent actions]
+// const lengthOfExclusion = [20, 240]; // [exclusion, excluded for violent actions]
 
 export default function Controller({
-  p,
+  // p,
   a,
-  t,
+  // t,
 }: {
-  p: number;
+  // p: number;
   a: number;
-  t: number;
+  // t: number;
 }) {
   const [playGo] = useSound(Go, { volume: 0.5 });
   const [playYon] = useSound(Yon, { volume: 0.5 });
