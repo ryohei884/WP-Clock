@@ -230,7 +230,7 @@ export default function Home() {
   ]);
 
   const OpenSubWindow = () => {
-    window.open(`http://localhost:3000/subwindow`, "Child1", "popup");
+    window.open(`/subwindow`, "Child1", "popup");
   };
 
   // periods: period in a game
@@ -244,13 +244,13 @@ export default function Home() {
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Button onClick={OpenSubWindow}>Save changes</Button>
-        <Link href="http://localhost:3000/controller?p=4&a=480&t=2">
+        <Link href="/controller?p=4&a=480&t=2">
           正式競技時間
         </Link>
-        <Link href="http://localhost:3000/controller?p=2&a=240&t=0">
+        <Link href="/controller?p=2&a=240&t=0">
           A区分予選競技時間
         </Link>
-        <Link href="http://localhost:3000/controller?p=4&a=240&t=2">
+        <Link href="/controller?p=4&a=240&t=2">
           A区分決勝競技時間
         </Link>
         <div>
